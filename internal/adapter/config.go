@@ -4,7 +4,7 @@
 package adapter // import "github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/adapter"
 
 import (
-	"github.com/fsgonz/otel-net-stats-receiver/internal/consumerretry"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/consumerretry"
 	"time"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
