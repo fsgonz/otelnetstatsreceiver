@@ -5,7 +5,7 @@ package adapter // import "github.com/open-telemetry/opentelemetry-collector-con
 
 import (
 	"context"
-	"github.com/fsgonz/otel-net-stats-receiver/internal/consumerretry"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/consumerretry"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
