@@ -23,7 +23,7 @@ func (i *Input) Stop() error {
 	return i.consumer.Stop()
 }
 
-func (i *Input) emit(ctx context.Context) error {
+func (i *Input) emit(ctx context.Context, token []byte, attrs map[string]any) error {
 	ent, err := i.NewEntry("hola")
 	if err != nil {
 		return fmt.Errorf("create entry: %w", err)
