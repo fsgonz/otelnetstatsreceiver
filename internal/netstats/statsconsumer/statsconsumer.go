@@ -3,6 +3,7 @@ package statsconsumer
 import (
 	"context"
 	"fmt"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/fileconsumer/emit"
 	"go.opentelemetry.io/collector/component"
 	"go.uber.org/zap"
 	"sync"
@@ -19,6 +20,7 @@ type Manager struct {
 
 	pollInterval  time.Duration
 	fromBeginning bool
+	emit          emit.Callback
 }
 
 func (m *Manager) Start() error {
@@ -54,6 +56,8 @@ func (m *Manager) startPoller(ctx context.Context) {
 // poll checks all the watched paths for new entries
 func (m *Manager) poll(ctx context.Context) {
 	m.set.Logger.Debug("Consuming stats")
+	m.emit(ctx, nil, nil)
+
 }
 
 func (m *Manager) Stop() error {
@@ -65,7 +69,7 @@ type Config struct {
 	StartAt      string        `mapstructure:"start_at,omitempty"`
 }
 
-func (c Config) Build(set component.TelemetrySettings, emit interface{}) (*Manager, error) {
+func (c Config) Build(set component.TelemetrySettings, emit emit.Callback) (*Manager, error) {
 	var startAtBeginning bool
 
 	switch c.StartAt {
@@ -81,5 +85,6 @@ func (c Config) Build(set component.TelemetrySettings, emit interface{}) (*Manag
 		set:           set,
 		pollInterval:  c.PollInterval,
 		fromBeginning: startAtBeginning,
+		emit:          emit,
 	}, nil
 }
