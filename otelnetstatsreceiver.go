@@ -4,8 +4,8 @@ import (
 	"github.com/fsgonz/otelnetstatsreceiver/internal/adapter"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/consumerretry"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/metadata"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/input"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator/input/file"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/receiver"
 )
@@ -16,7 +16,7 @@ func NewFactory() receiver.Factory {
 }
 
 // ReceiverType implements stanza.LogReceiverType
-// to create a file tailing receiver
+// to create a net usage stats receiver
 type ReceiverType struct{}
 
 // Type is the receiver type
@@ -34,7 +34,7 @@ func createDefaultConfig() *OtelNetStatsReceiverConfig {
 			Operators:      []operator.Config{},
 			RetryOnFailure: consumerretry.NewDefaultConfig(),
 		},
-		InputConfig: *file.NewConfig(),
+		InputConfig: *netstats.NewConfig(),
 	}
 }
 
@@ -45,7 +45,7 @@ func (f ReceiverType) BaseConfig(cfg component.Config) adapter.BaseConfig {
 
 // FileLogConfig defines configuration for the filelog receiver
 type OtelNetStatsReceiverConfig struct {
-	InputConfig        file.Config `mapstructure:",squash"`
+	InputConfig        netstats.Config `mapstructure:",squash"`
 	adapter.BaseConfig `mapstructure:",squash"`
 }
 

@@ -1,3 +1,3 @@
-package network_stats
+package netstats
 
 // Sampler is the interface we want to mock

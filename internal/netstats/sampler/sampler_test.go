@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/scraper"
 	"io"
-	"otel-net-stats-receiver/internal/network_stats/scraper"
 	"strconv"
 	"testing"
 )

@@ -1,7 +1,7 @@
 package sampler
 
 import (
-	"github.com/fsgonz/otel-net-stats-receiver/internal/network_stats/scraper"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/scraper"
 	"log"
 	"os"
 )
