@@ -1,6 +1,7 @@
 package netstats
 
 import (
+	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/statsconsumer"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator/helper"
 	"go.opentelemetry.io/collector/component"
@@ -25,7 +26,8 @@ func NewConfigWithID(operatorID string) *Config {
 }
 
 type Config struct {
-	helper.InputConfig `mapstructure:",squash"`
+	helper.InputConfig   `mapstructure:",squash"`
+	statsconsumer.Config `mapstructure:",squash"`
 }
 
 // Build will build a netstats input operator from the supplied configuration
