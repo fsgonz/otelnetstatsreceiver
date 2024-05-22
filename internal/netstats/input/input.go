@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/statsconsumer"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/entry"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator/helper"
@@ -13,6 +14,15 @@ import (
 type Input struct {
 	helper.InputOperator
 	consumer *statsconsumer.Manager
+}
+
+func (i *Input) Start(persister operator.Persister) error {
+	return i.consumer.Start()
+}
+
+// Stop will stop the file monitoring process
+func (i *Input) Stop() error {
+	return i.consumer.Stop()
 }
 
 func (i *Input) emit(ctx context.Context, token []byte, attrs map[string]any) error {

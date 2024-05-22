@@ -3,7 +3,6 @@ package statsconsumer
 import (
 	"context"
 	"fmt"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 	"go.opentelemetry.io/collector/component"
 	"go.uber.org/zap"
 	"sync"
@@ -22,7 +21,7 @@ type Manager struct {
 	fromBeginning bool
 }
 
-func (m *Manager) Start(persister operator.Persister) error {
+func (m *Manager) Start() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	m.cancel = cancel
 
@@ -55,6 +54,10 @@ func (m *Manager) startPoller(ctx context.Context) {
 // poll checks all the watched paths for new entries
 func (m *Manager) poll(ctx context.Context) {
 	m.set.Logger.Debug("Consuming stats")
+}
+
+func (m *Manager) Stop() error {
+	return nil
 }
 
 type Config struct {
