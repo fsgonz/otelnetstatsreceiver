@@ -32,5 +32,20 @@ type Config struct {
 
 // Build will build a netstats input operator from the supplied configuration
 func (c Config) Build(set component.TelemetrySettings) (operator.Operator, error) {
-	return nil, nil
+	inputOperator, err := c.InputConfig.Build(set)
+
+	if err != nil {
+		return nil, err
+	}
+
+	input := &Input{
+		InputOperator: inputOperator,
+	}
+
+	input.consumer, err = c.Config.Build(set, input.emit)
+	if err != nil {
+		return nil, err
+	}
+
+	return input, nil
 }
