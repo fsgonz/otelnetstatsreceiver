@@ -1,4 +1,4 @@
-module github.com/fsgonz/otel-net-stats-receiver
+module github.com/fsgonz/otelnetstatsreceiver
 
 go 1.21.0
 
