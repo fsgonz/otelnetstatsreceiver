@@ -1,9 +1,9 @@
 package otelnetstatsreceiver
 
 import (
-	"github.com/fsgonz/otel-net-stats-receiver/internal/adapter"
-	"github.com/fsgonz/otel-net-stats-receiver/internal/consumerretry"
-	"github.com/fsgonz/otel-net-stats-receiver/internal/metadata"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/adapter"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/consumerretry"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/metadata"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator/input/file"
 	"go.opentelemetry.io/collector/component"
