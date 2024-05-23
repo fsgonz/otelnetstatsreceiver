@@ -2,16 +2,12 @@ package netstats
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/sampler"
-	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/scraper"
-	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/statsconsumer"
-	"github.com/google/uuid"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/entry"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/fileconsumer"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator/helper"
-	"strconv"
-	"time"
+	"go.uber.org/zap"
 )
 
 type networkIOLogEntry struct {
@@ -38,7 +34,7 @@ type networkIOLogEntryEvent struct {
 
 type Input struct {
 	helper.InputOperator
-	consumer *statsconsumer.Manager
+	consumer *fileconsumer.Manager
 }
 
 func (i *Input) Start(persister operator.Persister) error {
@@ -50,63 +46,21 @@ func (i *Input) Stop() error {
 	return i.consumer.Stop()
 }
 
-func (i *Input) emit(ctx context.Context, persister operator.Persister) error {
-	byteSlice, err := persister.Get(ctx, "last_count")
-
-	var last_count uint64 = 0
-
-	if byteSlice != nil {
-		// Parse the string to an integer
-		counter, err := strconv.ParseUint(string(byteSlice), 10, 64)
-		last_count = counter
-		if err != nil {
-			i.Logger().Error("Error")
-		}
+func (i *Input) emit(ctx context.Context, token []byte, attrs map[string]any) error {
+	if len(token) == 0 {
+		return nil
 	}
 
-	basedSampler := sampler.NewFileBasedSampler("/Users/fabian.gonzalez/logs", scraper.NewLinuxNetworkDevicesFileScraper())
-
-	samp, _ := basedSampler.Sample()
-
-	orgID := "org_id"               // os.Getenv("ORG_ID")
-	envID := "env_id"               // os.Getenv("ENV_ID")
-	deploymentID := "deployment_id" // os.Getenv("DEPLOYMENT_ID")
-	rootOrgID := "root_org_id"      // os.Getenv("ROOT_ORG_ID")
-	billingEnabled := true          // os.Getenv("MULE_BILLING_ENABLED") == "true"
-	workerID := "worker-"           // + strings.ReplaceAll(os.Getenv("POD_NAME"), os.Getenv("APP_NAME")+"-", "")
-	ts := time.Now().Unix() * 1000
-
-	u, err := uuid.NewRandom()
-
-	evt := networkIOLogEntryEvent{
-		ID:         u.String(),
-		Timestamp:  ts,
-		RootOrgID:  rootOrgID,
-		OrgID:      orgID,
-		EnvID:      envID,
-		AssetID:    deploymentID,
-		WorkerID:   workerID,
-		UsageBytes: samp - last_count,
-		Billable:   billingEnabled,
-	}
-
-	e := networkIOLogEntry{
-		Format: "v1",
-		Time:   ts,
-		Events: []networkIOLogEntryEvent{evt},
-		Metadata: map[string]string{
-			"schema_id": "network_schema_id",
-		},
-	}
-
-	b, err := json.Marshal(e)
-
-	ent, err := i.NewEntry(string(b))
+	ent, err := i.NewEntry(string(token))
 	if err != nil {
 		return fmt.Errorf("create entry: %w", err)
 	}
+
+	for k, v := range attrs {
+		if err := ent.Set(entry.NewAttributeField(k), v); err != nil {
+			i.Logger().Error("set attribute", zap.Error(err))
+		}
+	}
 	i.Write(ctx, ent)
-	last_count++
-	persister.Set(ctx, "last_count", []byte(strconv.FormatUint(samp, 10)))
 	return nil
 }
