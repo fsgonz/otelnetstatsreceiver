@@ -46,6 +46,7 @@ func (i *Input) emit(ctx context.Context, persister operator.Persister) error {
 		return fmt.Errorf("create entry: %w", err)
 	}
 	i.Write(ctx, ent)
+	counter2++
 	persister.Set(ctx, "counter", []byte(strconv.Itoa(counter2)))
 	return nil
 }
