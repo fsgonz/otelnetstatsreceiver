@@ -22,6 +22,7 @@ func NewConfig() *Config {
 func NewConfigWithID(operatorID string) *Config {
 	return &Config{
 		InputConfig: helper.NewInputConfig(operatorID, operatorType),
+		Config:      *fileconsumer.NewConfig(),
 	}
 }
 
