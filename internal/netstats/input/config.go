@@ -45,7 +45,6 @@ func (c Config) Build(set component.TelemetrySettings) (operator.Operator, error
 		InputOperator: inputOperator,
 	}
 
-	c.Config.Include = append(c.Config.Include, c.MetricsOutputFile)
 	input.consumer, err = c.Config.Build(set, input.emit)
 	if err != nil {
 		return nil, err
