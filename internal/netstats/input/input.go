@@ -101,7 +101,7 @@ func (i *Input) emit(ctx context.Context, persister operator.Persister) error {
 
 	b, err := json.Marshal(e)
 
-	ent, err := i.NewEntry(b)
+	ent, err := i.NewEntry(string(b))
 	if err != nil {
 		return fmt.Errorf("create entry: %w", err)
 	}
