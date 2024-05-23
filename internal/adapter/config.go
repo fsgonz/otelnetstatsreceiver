@@ -16,7 +16,7 @@ type BaseConfig struct {
 	Operators                     []operator.Config    `mapstructure:"operators"`
 	StorageID                     *component.ID        `mapstructure:"storage"`
 	RetryOnFailure                consumerretry.Config `mapstructure:"retry_on_failure"`
-	MetricsGenerationPollInterval time.Duration        `mapstructure:"poll_interval,omitempty"`
+	MetricsGenerationPollInterval time.Duration        `mapstructure:"metrics_generation_poll_interval,omitempty"`
 	MetricsOutputFile             string               `mapstructure:"metrics_output_file,omitempty"`
 
 	// currently not configurable by users, but available for benchmarking
