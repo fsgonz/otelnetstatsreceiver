@@ -74,15 +74,18 @@ func createLogsReceiver(logReceiverType LogReceiverType) rcvr.CreateLogsFunc {
 		if err != nil {
 			return nil, err
 		}
+
 		return &receiver{
-			set:       params.TelemetrySettings,
-			id:        params.ID,
-			pipe:      pipe,
-			emitter:   emitter,
-			consumer:  consumerretry.NewLogs(baseCfg.RetryOnFailure, params.Logger, nextConsumer),
-			converter: converter,
-			obsrecv:   obsrecv,
-			storageID: baseCfg.StorageID,
+			set:                 params.TelemetrySettings,
+			id:                  params.ID,
+			pipe:                pipe,
+			emitter:             emitter,
+			consumer:            consumerretry.NewLogs(baseCfg.RetryOnFailure, params.Logger, nextConsumer),
+			converter:           converter,
+			obsrecv:             obsrecv,
+			storageID:           baseCfg.StorageID,
+			metricsPollInternal: baseCfg.MetricsGenerationPollInterval,
+			MetricsOutputFile:   baseCfg.MetricsOutputFile,
 		}, nil
 	}
 }
