@@ -26,7 +26,7 @@ func (i *Input) Stop() error {
 func (i *Input) emit(ctx context.Context, persister operator.Persister) error {
 	byteSlice, err := persister.Get(ctx, "counter")
 
-	var counter2 = 0
+	counter2 = 0
 
 	if byteSlice != nil {
 		// Parse the string to an integer
