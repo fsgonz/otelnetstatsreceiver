@@ -2,8 +2,7 @@ package statsconsumer
 
 import (
 	"context"
-	"fmt"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/fileconsumer/emit"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/emit"
 	"go.opentelemetry.io/collector/component"
 	"go.uber.org/zap"
 	"sync"
@@ -18,9 +17,8 @@ type Manager struct {
 	wg     sync.WaitGroup
 	cancel context.CancelFunc
 
-	pollInterval  time.Duration
-	fromBeginning bool
-	emit          emit.Callback
+	pollInterval time.Duration
+	emit         emit.Callback
 }
 
 func (m *Manager) Start() error {
@@ -55,36 +53,31 @@ func (m *Manager) startPoller(ctx context.Context) {
 
 // poll checks all the watched paths for new entries
 func (m *Manager) poll(ctx context.Context) {
-	m.set.Logger.Debug("Consuming stats")
-	m.emit(ctx, nil, nil)
+	err := m.emit(ctx)
+	if err != nil {
+		m.set.Logger.Debug("Error on consuming stats", zap.Error(err))
+		return
+	}
 
 }
 
 func (m *Manager) Stop() error {
+	if m.cancel != nil {
+		m.cancel()
+		m.cancel = nil
+	}
+	m.wg.Wait()
 	return nil
 }
 
 type Config struct {
 	PollInterval time.Duration `mapstructure:"poll_interval,omitempty"`
-	StartAt      string        `mapstructure:"start_at,omitempty"`
 }
 
 func (c Config) Build(set component.TelemetrySettings, emit emit.Callback) (*Manager, error) {
-	var startAtBeginning bool
-
-	switch c.StartAt {
-	case "beginning":
-		startAtBeginning = true
-	case "end":
-		startAtBeginning = false
-	default:
-		return nil, fmt.Errorf("invalid start_at location '%s'", c.StartAt)
-	}
-
 	return &Manager{
-		set:           set,
-		pollInterval:  c.PollInterval,
-		fromBeginning: startAtBeginning,
-		emit:          emit,
+		set:          set,
+		pollInterval: c.PollInterval,
+		emit:         emit,
 	}, nil
 }
