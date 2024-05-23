@@ -49,6 +49,6 @@ func (i *Input) emit(ctx context.Context, persister operator.Persister) error {
 	}
 	i.Write(ctx, ent)
 	last_count++
-	persister.Set(ctx, "counter", []byte(strconv.FormatUint(samp, 10)))
+	persister.Set(ctx, "last_count", []byte(strconv.FormatUint(samp, 10)))
 	return nil
 }
