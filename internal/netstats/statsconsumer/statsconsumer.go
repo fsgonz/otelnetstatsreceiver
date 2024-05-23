@@ -3,6 +3,7 @@ package statsconsumer
 import (
 	"context"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/emit"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 	"go.opentelemetry.io/collector/component"
 	"go.uber.org/zap"
 	"sync"
@@ -21,18 +22,18 @@ type Manager struct {
 	emit         emit.Callback
 }
 
-func (m *Manager) Start() error {
+func (m *Manager) Start(persister operator.Persister) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	m.cancel = cancel
 
 	// Start polling goroutine
-	m.startPoller(ctx)
+	m.startPoller(ctx, persister)
 
 	return nil
 }
 
 // startPoller kicks off a goroutine that will poll for net stats periodically.
-func (m *Manager) startPoller(ctx context.Context) {
+func (m *Manager) startPoller(ctx context.Context, persister operator.Persister) {
 	m.wg.Add(1)
 	go func() {
 		defer m.wg.Done()
@@ -46,14 +47,14 @@ func (m *Manager) startPoller(ctx context.Context) {
 			case <-globTicker.C:
 			}
 
-			m.poll(ctx)
+			m.poll(ctx, persister)
 		}
 	}()
 }
 
 // poll checks all the watched paths for new entries
-func (m *Manager) poll(ctx context.Context) {
-	err := m.emit(ctx)
+func (m *Manager) poll(ctx context.Context, persister operator.Persister) {
+	err := m.emit(ctx, persister)
 	if err != nil {
 		m.set.Logger.Debug("Error on consuming stats", zap.Error(err))
 		return
