@@ -25,6 +25,11 @@ type FileBasedSampler struct {
 	scraper scraper.NetworkStatsScraper
 }
 
+func NewFileBasedSampler(uri string, statsScraper scraper.NetworkStatsScraper) *FileBasedSampler {
+	return &FileBasedSampler{uri: uri,
+		scraper: statsScraper}
+}
+
 // Will sample from a file
 func (s *FileBasedSampler) Sample() (uint64, error) {
 	f, err := os.Open(s.uri)

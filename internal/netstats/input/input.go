@@ -3,6 +3,8 @@ package netstats
 import (
 	"context"
 	"fmt"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/sampler"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/scraper"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/statsconsumer"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator/helper"
@@ -24,29 +26,29 @@ func (i *Input) Stop() error {
 }
 
 func (i *Input) emit(ctx context.Context, persister operator.Persister) error {
-	byteSlice, err := persister.Get(ctx, "counter")
+	byteSlice, err := persister.Get(ctx, "last_count")
 
-	var counter2 = 0
+	var last_count uint64 = 0
 
 	if byteSlice != nil {
 		// Parse the string to an integer
-		counter, err := strconv.Atoi(string(byteSlice))
-		counter2 = counter
+		counter, err := strconv.ParseUint(string(byteSlice), 10, 64)
+		last_count = counter
 		if err != nil {
-			// Handle the error if the conversion fails
-			fmt.Println("Error:", err)
-		} else {
-			// Successfully converted to an integer
-			fmt.Println("The integer value is:", counter)
+			i.Logger().Error("Error")
 		}
 	}
 
-	ent, err := i.NewEntry(counter2)
+	basedSampler := sampler.NewFileBasedSampler("/Users/fabian.gonzalez/logs", scraper.NewLinuxNetworkDevicesFileScraper())
+
+	samp, _ := basedSampler.Sample()
+
+	ent, err := i.NewEntry(samp - last_count)
 	if err != nil {
 		return fmt.Errorf("create entry: %w", err)
 	}
 	i.Write(ctx, ent)
-	counter2++
-	persister.Set(ctx, "counter", []byte(strconv.Itoa(counter2)))
+	last_count++
+	persister.Set(ctx, "counter", []byte(strconv.FormatUint(last_count, 10)))
 	return nil
 }
