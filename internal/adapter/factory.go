@@ -6,7 +6,6 @@ package adapter // import "github.com/open-telemetry/opentelemetry-collector-con
 import (
 	"context"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/consumerretry"
-
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
 	rcvr "go.opentelemetry.io/collector/receiver"
@@ -23,6 +22,17 @@ type LogReceiverType interface {
 	CreateDefaultConfig() component.Config
 	BaseConfig(component.Config) BaseConfig
 	InputConfig(component.Config) operator.Config
+	LogSamplers() []LogSamplerConfig
+}
+
+type LogSamplerConfig struct {
+	LogSamplers []LogSampler `mapstructure:"log_samplers"`
+}
+
+type LogSampler struct {
+	Metric string `mapstructure:"metric"`
+	Output string `mapstructure:"output"`
+	URI    string `mapstructure:"uri"`
 }
 
 // NewFactory creates a factory for a Stanza-based receiver

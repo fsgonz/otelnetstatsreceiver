@@ -4,9 +4,12 @@ import (
 	"io"
 )
 
-// NetworkStats represents received and transmitted byte counts for a network interface.
+// NetworkStats represents the network statistics containing the number of received and transmitted bytes.
 type NetworkStats struct {
-	ReceivedBytes    uint64
+	// ReceivedBytes holds the number of bytes received over the network.
+	ReceivedBytes uint64
+
+	// TransmittedBytes holds the number of bytes transmitted over the network.
 	TransmittedBytes uint64
 }
 

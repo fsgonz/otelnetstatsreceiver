@@ -1,21 +1,22 @@
 package sampler
 
 import (
+	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/scraper"
+
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/scraper"
 	"io"
+	"io/ioutil"
+	"os"
 	"strconv"
 	"testing"
 )
 
 func TestFileBasedSampler(t *testing.T) {
 	t.Run("retrieves the sum of the received and transmit from a file.", func(t *testing.T) {
-		sampler := FileBasedSampler{
-			uri:     "testdata/test1.data",
-			scraper: &BreakLineScraper{},
-		}
+		sampler := NewFileBasedSampler("testdata/test1.data", &BreakLineScraper{})
+
 		want := uint64(1030)
 
 		got, err := sampler.Sample()
@@ -30,11 +31,7 @@ func TestFileBasedSampler(t *testing.T) {
 
 	t.Run("when a file does not exists an error is raised", func(t *testing.T) {
 		const wanted = "open nonExistingFile.data: no such file or directory"
-
-		sampler := FileBasedSampler{
-			uri:     "nonExistingFile.data",
-			scraper: &BreakLineScraper{},
-		}
+		sampler := NewFileBasedSampler("nonExistingFile.data", &BreakLineScraper{})
 
 		_, err := sampler.Sample()
 
@@ -51,11 +48,7 @@ func TestFileBasedSampler(t *testing.T) {
 
 	t.Run("when the scraper fails, the error is propagated to the sampler", func(t *testing.T) {
 		alwaysFailScraper := &AlwaysFailScraper{Error: "Test error"}
-
-		sampler := FileBasedSampler{
-			uri:     "testdata/test1.data",
-			scraper: alwaysFailScraper,
-		}
+		sampler := NewFileBasedSampler("testdata/test1.data", alwaysFailScraper)
 
 		_, err := sampler.Sample()
 
@@ -68,9 +61,91 @@ func TestFileBasedSampler(t *testing.T) {
 		if errorMessage != alwaysFailScraper.Error {
 			t.Errorf("Expected error was '%s' but it was '%s'", alwaysFailScraper.Error, errorMessage)
 		}
+	})
 
+	t.Run("when the scraper fails, the error is propagated to the sampler", func(t *testing.T) {
+		alwaysFailScraper := &AlwaysFailScraper{Error: "Test error"}
+		sampler := NewFileBasedSampler("testdata/test1.data", alwaysFailScraper)
+
+		_, err := sampler.Sample()
+
+		if err == nil {
+			t.Errorf("An error was expected but err was nil")
+		}
+
+		errorMessage := err.Error()
+
+		if errorMessage != alwaysFailScraper.Error {
+			t.Errorf("Expected error was '%s' but it was '%s'", alwaysFailScraper.Error, errorMessage)
+		}
 	})
 }
+
+func TestFileBasedDeltaSampler(t *testing.T) {
+	t.Run("retrieves the delta of the sum of the received and transmit from a file.", func(t *testing.T) {
+		tempFile, err := ioutil.TempFile("", "TestFileBasedDeltaSampler-*.txt")
+
+		if err != nil {
+			t.Errorf("Error on creating temporary file %s", err.Error())
+			return
+		}
+		tempFilePath := tempFile.Name()
+		defer os.Remove(tempFilePath)
+
+		err = addValuesToTempFile(tempFile, 200, 400)
+
+		if err != nil {
+			t.Errorf("Error on adding values to temp file %s", err.Error())
+			return
+		}
+
+		sampler := NewFileBasedDeltaSampler(tempFilePath, &BreakLineScraper{}, &TestStorage{})
+
+		want := uint64(600)
+
+		got, err := sampler.Sample()
+
+		if err != nil {
+			t.Errorf("Error on sampling %s", err.Error())
+			return
+		}
+		if got != want {
+			t.Errorf("got %d want %d", got, want)
+		}
+
+		tempFile, err = os.OpenFile(tempFile.Name(), os.O_WRONLY|os.O_TRUNC, 0666)
+		err = addValuesToTempFile(tempFile, 400, 600)
+
+		want = uint64(400)
+
+		got, err = sampler.Sample()
+
+		if err != nil {
+			t.Errorf("Error on sampling %s", err.Error())
+			return
+		}
+		if got != want {
+			t.Errorf("got %d want %d", got, want)
+			return
+		}
+	})
+}
+
+func addValuesToTempFile(tempFile *os.File, readBytes uint64, transmitBytes uint64) error {
+	// Write the numbers to the file, each on a new line
+	content := fmt.Sprintf("%d\n%d", readBytes, transmitBytes)
+	if _, err := tempFile.Write([]byte(content)); err != nil {
+		return err
+	}
+
+	// Close the file
+	if err := tempFile.Close(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Scrapers for testing
 
 type AlwaysFailScraper struct {
 	Error string
@@ -108,4 +183,19 @@ func (s *BreakLineScraper) Scrape(r io.Reader) (scraper.NetworkStats, error) {
 	}
 
 	return scraper.NetworkStats{ReceivedBytes: firstPart, TransmittedBytes: secondPart}, nil
+}
+
+// Storage for testing
+
+type TestStorage struct {
+	LastCount uint64
+}
+
+func (s *TestStorage) Load() (uint64, error) {
+	return s.LastCount, nil
+}
+
+func (s *TestStorage) Save(value uint64) error {
+	s.LastCount = value
+	return nil
 }

@@ -16,7 +16,7 @@ const (
 	defaultMetricsOutputFile             = "/tmp/_network_metering_metric.log"
 )
 
-// NewFactory creates a factory for filelog receiver
+// NewFactory creates a factory for receiver
 func NewFactory() receiver.Factory {
 	return adapter.NewFactory(ReceiverType{}, metadata.LogsStability)
 }
@@ -51,9 +51,12 @@ func (f ReceiverType) BaseConfig(cfg component.Config) adapter.BaseConfig {
 	return cfg.(*OtelNetStatsReceiverConfig).BaseConfig
 }
 
-// FileLogConfig defines configuration for the filelog receiver
+// OtelNetStatsReceiverConfig represents the configuration for the OpenTelemetry NetStats Logs Receiver.
 type OtelNetStatsReceiverConfig struct {
-	InputConfig        netstats.Config `mapstructure:",squash"`
+	// InputConfig embeds the configuration for the network statistics input.
+	InputConfig netstats.Config `mapstructure:",squash"`
+
+	// BaseConfig embeds the base configuration for the logs receiver.
 	adapter.BaseConfig `mapstructure:",squash"`
 }
 

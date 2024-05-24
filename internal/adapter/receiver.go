@@ -223,6 +223,8 @@ func persistMetrics(logger *log.Logger, ctx context.Context, persister operator.
 
 	samp, _ := basedSampler.Sample()
 
+	persister.Set(ctx, "last_count", []byte(strconv.FormatUint(samp, 10)))
+
 	orgID := "org_id"               // os.Getenv("ORG_ID")
 	envID := "env_id"               // os.Getenv("ENV_ID")
 	deploymentID := "deployment_id" // os.Getenv("DEPLOYMENT_ID")
