@@ -3,7 +3,6 @@ package otelnetstatsreceiver
 import (
 	"github.com/fsgonz/otelnetstatsreceiver/internal/adapter"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/consumerretry"
-	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/input"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/entry"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator/helper"
@@ -69,7 +68,7 @@ func testdataConfigYaml() *OtelNetStatsReceiverConfig {
 				MaxElapsedTime:  5 * time.Minute,
 			},
 		},
-		InputConfig: netstats.Config(func() file.Config {
+		InputConfig: adapter.FileInputConfig(func() file.Config {
 			c := file.NewConfig()
 			c.Include = []string{"testdata/simple.log"}
 			c.StartAt = "beginning"

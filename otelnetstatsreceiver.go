@@ -4,7 +4,6 @@ import (
 	"github.com/fsgonz/otelnetstatsreceiver/internal/adapter"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/consumerretry"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/metadata"
-	"github.com/fsgonz/otelnetstatsreceiver/internal/netstats/input"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/receiver"
@@ -43,7 +42,7 @@ func createDefaultConfig() *OtelNetStatsReceiverConfig {
 			MetricsGenerationPollInterval: defaultMetricsGenerationPoolInterval,
 			MetricsOutputFile:             defaultMetricsOutputFile,
 		},
-		InputConfig: *netstats.NewConfig(),
+		InputConfig: *adapter.NewFileInputConfig(),
 		LogSamplerConfig: adapter.LogSamplerConfig{
 			LogSamplers: []adapter.LogSampler{},
 		},
@@ -58,7 +57,7 @@ func (f ReceiverType) BaseConfig(cfg component.Config) adapter.BaseConfig {
 // OtelNetStatsReceiverConfig represents the configuration for the OpenTelemetry NetStats Logs Receiver.
 type OtelNetStatsReceiverConfig struct {
 	// InputConfig embeds the configuration for the network statistics input.
-	InputConfig netstats.Config `mapstructure:",squash"`
+	InputConfig adapter.FileInputConfig `mapstructure:",squash"`
 
 	// BaseConfig embeds the base configuration for the logs receiver.
 	adapter.BaseConfig `mapstructure:",squash"`
