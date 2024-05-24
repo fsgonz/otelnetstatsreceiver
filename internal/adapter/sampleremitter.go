@@ -19,10 +19,12 @@ import (
 )
 
 const (
-	LAST_COUNT_KEY    = "LAST_COUNT"
-	FORMAT            = "v1"
-	SCHEMA_ID         = "schema_id"
-	NETWORK_SCHEMA_ID = "network_schema_id"
+	LAST_COUNT_KEY          = "LAST_COUNT"
+	FORMAT                  = "v1"
+	SCHEMA_ID               = "schema_id"
+	NETWORK_SCHEMA_ID       = "network_schema_id"
+	FILE_LOGGER_OUTPUT      = "file_logger"
+	PIPELINE_EMITTER_OUTPUT = "pipeline_emitter"
 )
 
 type networkIOLogEntry struct {
@@ -81,7 +83,7 @@ func SamplerEmitterFactory(output string, uri string, persister operator.Persist
 	fileBasedSampler := sampler.NewFileBasedSampler("/Users/fabian.gonzalez/logs", scraper.NewLinuxNetworkDevicesFileScraper())
 
 	switch output {
-	case "file_logger":
+	case FILE_LOGGER_OUTPUT:
 		metricsLogger := log.New(&lumberjack.Logger{
 			Filename:   uri,
 			MaxSize:    100, // kilobytes
@@ -94,7 +96,7 @@ func SamplerEmitterFactory(output string, uri string, persister operator.Persist
 			persister,
 			fileBasedSampler,
 		}, nil
-	case "pipeline_consumer":
+	case PIPELINE_EMITTER_OUTPUT:
 		return PipelineConsumerSamplerEmitter{
 			*emitter,
 			persister,
