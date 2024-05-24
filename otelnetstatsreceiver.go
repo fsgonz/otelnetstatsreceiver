@@ -34,6 +34,11 @@ func (f ReceiverType) Type() component.Type {
 func (f ReceiverType) CreateDefaultConfig() component.Config {
 	return createDefaultConfig()
 }
+
+func (f ReceiverType) LogSamplers() []adapter.LogSamplerConfig {
+	return []adapter.LogSamplerConfig{}
+}
+
 func createDefaultConfig() *OtelNetStatsReceiverConfig {
 	return &OtelNetStatsReceiverConfig{
 		BaseConfig: adapter.BaseConfig{
