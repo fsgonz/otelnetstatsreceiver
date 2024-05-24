@@ -75,7 +75,7 @@ type PipelineConsumerSamplerEmitter struct {
 func (e PipelineConsumerSamplerEmitter) Emit(ctx context.Context) {
 	jsonEntry := logEntry(ctx, e.persister, e.sampler)
 	entryToProcess := entry.New()
-	entryToProcess.Body = jsonEntry
+	entryToProcess.Body = string(jsonEntry)
 	e.Emitter.Process(ctx, entryToProcess)
 }
 
