@@ -25,16 +25,6 @@ type LogReceiverType interface {
 	LogSamplers(component.Config) []LogSampler
 }
 
-type LogSamplerConfig struct {
-	LogSamplers []LogSampler `mapstructure:"log_samplers"`
-}
-
-type LogSampler struct {
-	Metric string `mapstructure:"metric"`
-	Output string `mapstructure:"output"`
-	URI    string `mapstructure:"uri"`
-}
-
 // NewFactory creates a factory for a Stanza-based receiver
 func NewFactory(logReceiverType LogReceiverType, sl component.StabilityLevel) rcvr.Factory {
 	return rcvr.NewFactory(

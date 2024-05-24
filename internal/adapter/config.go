@@ -24,3 +24,17 @@ type BaseConfig struct {
 	maxBatchSize  uint
 	flushInterval time.Duration
 }
+
+type LogSamplerConfig struct {
+	LogSamplers []LogSampler `mapstructure:"log_samplers"`
+}
+
+type LogSampler struct {
+	Metric string `mapstructure:"metric"`
+	Output string `mapstructure:"output"`
+	URI    string `mapstructure:"uri"`
+}
+
+func (cfg *LogSamplerConfig) Validate() error {
+	return nil
+}
