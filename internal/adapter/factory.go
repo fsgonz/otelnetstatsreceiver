@@ -22,7 +22,7 @@ type LogReceiverType interface {
 	CreateDefaultConfig() component.Config
 	BaseConfig(component.Config) BaseConfig
 	InputConfig(component.Config) operator.Config
-	LogSamplers() []LogSamplerConfig
+	LogSamplers(component.Config) []LogSampler
 }
 
 type LogSamplerConfig struct {

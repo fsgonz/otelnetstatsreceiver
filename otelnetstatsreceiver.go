@@ -34,6 +34,7 @@ func (f ReceiverType) Type() component.Type {
 func (f ReceiverType) CreateDefaultConfig() component.Config {
 	return createDefaultConfig()
 }
+
 func createDefaultConfig() *OtelNetStatsReceiverConfig {
 	return &OtelNetStatsReceiverConfig{
 		BaseConfig: adapter.BaseConfig{
@@ -43,6 +44,9 @@ func createDefaultConfig() *OtelNetStatsReceiverConfig {
 			MetricsOutputFile:             defaultMetricsOutputFile,
 		},
 		InputConfig: *netstats.NewConfig(),
+		LogSamplerConfig: adapter.LogSamplerConfig{
+			LogSamplers: []adapter.LogSampler{},
+		},
 	}
 }
 
@@ -58,9 +62,16 @@ type OtelNetStatsReceiverConfig struct {
 
 	// BaseConfig embeds the base configuration for the logs receiver.
 	adapter.BaseConfig `mapstructure:",squash"`
+
+	// Log samplers
+	adapter.LogSamplerConfig `mapstructure:",squash"`
 }
 
 // InputConfig unmarshals the input operator
 func (f ReceiverType) InputConfig(cfg component.Config) operator.Config {
 	return operator.NewConfig(&cfg.(*OtelNetStatsReceiverConfig).InputConfig)
+}
+
+func (f ReceiverType) LogSamplers(cfg component.Config) []adapter.LogSampler {
+	return cfg.(*OtelNetStatsReceiverConfig).LogSamplers
 }
