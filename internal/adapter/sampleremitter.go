@@ -79,7 +79,7 @@ func (e PipelineConsumerSamplerEmitter) Emit(ctx context.Context) {
 }
 
 func SamplerEmitterFactory(output string, uri string, persister operator.Persister, emitter *helper.LogEmitter, input file.Input) (SamplerEmitter, error) {
-	fileBasedSampler := sampler.NewFileBasedSampler("/Users/fabian.gonzalez/logs", scraper.NewLinuxNetworkDevicesFileScraper())
+	fileBasedSampler := sampler.NewFileBasedSampler(uri, scraper.NewLinuxNetworkDevicesFileScraper())
 
 	switch output {
 	case FILE_LOGGER_OUTPUT:
