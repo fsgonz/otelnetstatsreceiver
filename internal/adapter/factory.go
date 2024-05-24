@@ -25,7 +25,7 @@ type LogReceiverType interface {
 	BaseConfig(component.Config) BaseConfig
 	InputConfig(component.Config) operator.Config
 	LogSamplers(component.Config) logsampler.Config
-	Input() file.Input
+	Input(cfg component.Config) file.Input
 }
 
 // NewFactory creates a factory for a Stanza-based receiver
