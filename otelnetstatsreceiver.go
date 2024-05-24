@@ -58,7 +58,7 @@ type OtelNetStatsReceiverConfig struct {
 
 	// Log samplers
 	logsampler.Config `mapstructure:",squash"`
-	LogSamplerConfig  logsampler.Config
+	LogSamplerConfig  logsampler.Config `mapstructure:",squash"`
 }
 
 // InputConfig unmarshals the input operator
