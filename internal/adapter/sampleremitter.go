@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/file"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/lumberjack"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/stats/sampler"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/stats/scraper"
 	"github.com/google/uuid"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/entry"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator/helper"
 	"log"
@@ -70,16 +70,15 @@ type PipelineConsumerSamplerEmitter struct {
 	Emitter   helper.LogEmitter
 	persister operator.Persister
 	sampler   sampler.Sampler
+	input     file.Input
 }
 
 func (e PipelineConsumerSamplerEmitter) Emit(ctx context.Context) {
 	jsonEntry := logEntry(ctx, e.persister, e.sampler)
-	entryToProcess := entry.New()
-	entryToProcess.Body = string(jsonEntry)
-	e.Emitter.Process(ctx, entryToProcess)
+	e.input.Emit(ctx, jsonEntry, map[string]any{})
 }
 
-func SamplerEmitterFactory(output string, uri string, persister operator.Persister, emitter *helper.LogEmitter) (SamplerEmitter, error) {
+func SamplerEmitterFactory(output string, uri string, persister operator.Persister, emitter *helper.LogEmitter, input file.Input) (SamplerEmitter, error) {
 	fileBasedSampler := sampler.NewFileBasedSampler("/Users/fabian.gonzalez/logs", scraper.NewLinuxNetworkDevicesFileScraper())
 
 	switch output {
@@ -101,6 +100,7 @@ func SamplerEmitterFactory(output string, uri string, persister operator.Persist
 			*emitter,
 			persister,
 			fileBasedSampler,
+			input,
 		}, nil
 	default:
 		return nil, fmt.Errorf("unknown output type: %s", output)

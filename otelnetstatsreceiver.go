@@ -69,3 +69,7 @@ func (f ReceiverType) InputConfig(cfg component.Config) operator.Config {
 func (f ReceiverType) LogSamplers(cfg component.Config) logsampler.Config {
 	return cfg.(*OtelNetStatsReceiverConfig).LogSamplerConfig
 }
+
+func (f ReceiverType) Input(cfg component.Config) file.Input {
+	return cfg.(*OtelNetStatsReceiverConfig).InputConfig.Input()
+}

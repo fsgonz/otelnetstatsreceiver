@@ -40,6 +40,8 @@ func (c FileInputConfig) Build(set component.TelemetrySettings) (operator.Operat
 		InputOperator: inputOperator,
 	}
 
+	c.input = *input
+
 	input.consumer, err = c.Config.Build(set, input.emit)
 	if err != nil {
 		return nil, err
@@ -48,7 +50,13 @@ func (c FileInputConfig) Build(set component.TelemetrySettings) (operator.Operat
 	return input, nil
 }
 
+func (c FileInputConfig) Input() Input {
+	return c.input
+}
+
 type FileInputConfig struct {
 	helper.InputConfig  `mapstructure:",squash"`
 	fileconsumer.Config `mapstructure:",squash"`
+
+	input Input
 }

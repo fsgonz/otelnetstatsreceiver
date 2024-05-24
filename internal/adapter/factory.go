@@ -6,6 +6,7 @@ package adapter // import "github.com/open-telemetry/opentelemetry-collector-con
 import (
 	"context"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/consumerretry"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/file"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/logsampler"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator/helper"
@@ -24,6 +25,7 @@ type LogReceiverType interface {
 	BaseConfig(component.Config) BaseConfig
 	InputConfig(component.Config) operator.Config
 	LogSamplers(component.Config) logsampler.Config
+	Input() file.Input
 }
 
 // NewFactory creates a factory for a Stanza-based receiver
@@ -45,6 +47,7 @@ func createLogsReceiver(logReceiverType LogReceiverType) rcvr.CreateLogsFunc {
 		inputCfg := logReceiverType.InputConfig(cfg)
 		baseCfg := logReceiverType.BaseConfig(cfg)
 		logSamplerCfg := logReceiverType.LogSamplers(cfg)
+		input := logReceiverType.Input()
 
 		operators := append([]operator.Config{inputCfg}, baseCfg.Operators...)
 
@@ -105,6 +108,7 @@ func createLogsReceiver(logReceiverType LogReceiverType) rcvr.CreateLogsFunc {
 			samplerPollInterval: samplerPollInterval,
 			samplerOutput:       samplerOutput,
 			samplerURI:          samplerUri,
+			input:               input,
 		}, nil
 	}
 }

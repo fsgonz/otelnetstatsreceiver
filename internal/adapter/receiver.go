@@ -6,6 +6,7 @@ package adapter // import "github.com/open-telemetry/opentelemetry-collector-con
 import (
 	"context"
 	"fmt"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/file"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 	"sync"
 	"time"
@@ -40,6 +41,7 @@ type receiver struct {
 
 	storageID     *component.ID
 	storageClient storage.Client
+	input         file.Input
 }
 
 // Ensure this receiver adheres to required interface
@@ -162,7 +164,7 @@ func (r *receiver) Shutdown(ctx context.Context) error {
 }
 
 func (r *receiver) samplerLoop(ctx context.Context, persister operator.Persister) {
-	samplerEmitter, err := SamplerEmitterFactory(r.samplerOutput, r.samplerURI, persister, r.emitter)
+	samplerEmitter, err := SamplerEmitterFactory(r.samplerOutput, r.samplerURI, persister, r.emitter, r.input)
 
 	if err != nil {
 		r.set.Logger.Debug("Error on sampler loop creation", zap.Error(err))

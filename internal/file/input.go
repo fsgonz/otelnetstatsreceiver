@@ -24,6 +24,10 @@ func (i *Input) Stop() error {
 	return i.consumer.Stop()
 }
 
+func (i *Input) Emit(ctx context.Context, token []byte, attrs map[string]any) error {
+	return i.emit(ctx, token, attrs)
+}
+
 func (i *Input) emit(ctx context.Context, token []byte, attrs map[string]any) error {
 	if len(token) == 0 {
 		return nil
