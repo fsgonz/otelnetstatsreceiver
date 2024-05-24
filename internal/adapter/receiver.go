@@ -162,7 +162,7 @@ func (r *receiver) Shutdown(ctx context.Context) error {
 }
 
 func (r *receiver) samplerLoop(ctx context.Context, persister operator.Persister) {
-	samplerEmitter, err := SamplerEmitterFactory(r.sampler, r.samplerOutput, r.samplerURI, persister, r.emitter)
+	samplerEmitter, err := SamplerEmitterFactory(r.samplerOutput, r.samplerURI, persister, r.emitter)
 
 	if err != nil {
 		r.set.Logger.Debug("Error on sampler loop creation", zap.Error(err))

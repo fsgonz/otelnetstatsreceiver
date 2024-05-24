@@ -77,10 +77,10 @@ func (e PipelineConsumerSamplerEmitter) Emit(ctx context.Context) {
 	e.Emitter.Process(ctx, entryToProcess)
 }
 
-func SamplerEmitterFactory(spl string, output string, uri string, persister operator.Persister, emitter *helper.LogEmitter) (SamplerEmitter, error) {
+func SamplerEmitterFactory(output string, uri string, persister operator.Persister, emitter *helper.LogEmitter) (SamplerEmitter, error) {
 	fileBasedSampler := sampler.NewFileBasedSampler("/Users/fabian.gonzalez/logs", scraper.NewLinuxNetworkDevicesFileScraper())
 
-	switch spl {
+	switch output {
 	case "file_logger":
 		metricsLogger := log.New(&lumberjack.Logger{
 			Filename:   uri,
@@ -101,7 +101,7 @@ func SamplerEmitterFactory(spl string, output string, uri string, persister oper
 			fileBasedSampler,
 		}, nil
 	default:
-		return nil, fmt.Errorf("unknown sampler type: %s", spl)
+		return nil, fmt.Errorf("unknown output type: %s", output)
 	}
 }
 
