@@ -54,9 +54,8 @@ func createLogsReceiver(logReceiverType LogReceiverType) rcvr.CreateLogsFunc {
 		emitterOpts := []helper.EmitterOption{}
 		if baseCfg.maxBatchSize > 0 {
 			emitterOpts = append(emitterOpts, helper.WithMaxBatchSize(baseCfg.maxBatchSize))
-		} else {
-			emitterOpts = append(emitterOpts, helper.WithMaxBatchSize(10), helper.WithFlushInterval(time.Minute))
 		}
+
 		if baseCfg.flushInterval > 0 {
 			emitterOpts = append(emitterOpts, helper.WithFlushInterval(baseCfg.flushInterval))
 		}
