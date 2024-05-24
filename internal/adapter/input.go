@@ -1,4 +1,4 @@
-package netstats
+package adapter
 
 import (
 	"context"
@@ -9,28 +9,6 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator/helper"
 	"go.uber.org/zap"
 )
-
-type networkIOLogEntry struct {
-	// Format is the schema version
-	Format string `json:"format"`
-	// Time is the time this entry was created in unix epoch milliseconds
-	Time     int64                    `json:"time"`
-	Events   []networkIOLogEntryEvent `json:"events"`
-	Metadata map[string]string        `json:"metadata"`
-}
-
-type networkIOLogEntryEvent struct {
-	ID string `json:"id"`
-	// Timestamp is the time this entry was created in unix epoch milliseconds
-	Timestamp  int64  `json:"timestamp"`
-	RootOrgID  string `json:"root_org_id"`
-	OrgID      string `json:"org_id"`
-	EnvID      string `json:"env_id"`
-	AssetID    string `json:"asset_id"`
-	WorkerID   string `json:"worker_id"`
-	UsageBytes uint64 `json:"usage_bytes"`
-	Billable   bool   `json:"billable"`
-}
 
 type Input struct {
 	helper.InputOperator
