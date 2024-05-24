@@ -1,4 +1,4 @@
-package adapter
+package lumberjack
 
 import (
 	"os"

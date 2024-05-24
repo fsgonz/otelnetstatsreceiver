@@ -1,7 +1,7 @@
 //go:build !linux
 // +build !linux
 
-package adapter
+package lumberjack
 
 import (
 	"os"

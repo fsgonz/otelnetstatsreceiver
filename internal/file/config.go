@@ -28,7 +28,7 @@ func NewFileInputConfigWithID(operatorID string) *FileInputConfig {
 	}
 }
 
-// Build will build a netstats input operator from the supplied configuration
+// Build will build a stats input operator from the supplied configuration
 func (c FileInputConfig) Build(set component.TelemetrySettings) (operator.Operator, error) {
 	inputOperator, err := c.InputConfig.Build(set)
 

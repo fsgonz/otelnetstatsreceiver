@@ -9,12 +9,6 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/receiver"
-	"time"
-)
-
-const (
-	defaultMetricsGenerationPoolInterval = 60 * time.Second
-	defaultMetricsOutputFile             = "/tmp/_network_metering_metric.log"
 )
 
 // NewFactory creates a factory for receiver
@@ -39,10 +33,8 @@ func (f ReceiverType) CreateDefaultConfig() component.Config {
 func createDefaultConfig() *OtelNetStatsReceiverConfig {
 	return &OtelNetStatsReceiverConfig{
 		BaseConfig: adapter.BaseConfig{
-			Operators:                     []operator.Config{},
-			RetryOnFailure:                consumerretry.NewDefaultConfig(),
-			MetricsGenerationPollInterval: defaultMetricsGenerationPoolInterval,
-			MetricsOutputFile:             defaultMetricsOutputFile,
+			Operators:      []operator.Config{},
+			RetryOnFailure: consumerretry.NewDefaultConfig(),
 		},
 		InputConfig: *file.NewFileInputConfig(),
 		LogSamplerConfig: logsampler.Config{
