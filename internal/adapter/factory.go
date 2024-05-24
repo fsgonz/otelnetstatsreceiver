@@ -47,7 +47,7 @@ func createLogsReceiver(logReceiverType LogReceiverType) rcvr.CreateLogsFunc {
 		inputCfg := logReceiverType.InputConfig(cfg)
 		baseCfg := logReceiverType.BaseConfig(cfg)
 		logSamplerCfg := logReceiverType.LogSamplers(cfg)
-		input := logReceiverType.Input()
+		input := logReceiverType.Input(cfg)
 
 		operators := append([]operator.Config{inputCfg}, baseCfg.Operators...)
 
