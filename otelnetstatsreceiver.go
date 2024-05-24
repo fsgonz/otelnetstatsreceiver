@@ -3,6 +3,8 @@ package otelnetstatsreceiver
 import (
 	"github.com/fsgonz/otelnetstatsreceiver/internal/adapter"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/consumerretry"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/file"
+	"github.com/fsgonz/otelnetstatsreceiver/internal/logsampler"
 	"github.com/fsgonz/otelnetstatsreceiver/internal/metadata"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/operator"
 	"go.opentelemetry.io/collector/component"
@@ -42,9 +44,9 @@ func createDefaultConfig() *OtelNetStatsReceiverConfig {
 			MetricsGenerationPollInterval: defaultMetricsGenerationPoolInterval,
 			MetricsOutputFile:             defaultMetricsOutputFile,
 		},
-		InputConfig: *adapter.NewFileInputConfig(),
-		LogSamplerConfig: adapter.LogSamplerConfig{
-			LogSamplers: []adapter.LogSampler{},
+		InputConfig: *file.NewFileInputConfig(),
+		LogSamplerConfig: logsampler.Config{
+			LogSamplers: []logsampler.LogSampler{},
 		},
 	}
 }
@@ -57,13 +59,14 @@ func (f ReceiverType) BaseConfig(cfg component.Config) adapter.BaseConfig {
 // OtelNetStatsReceiverConfig represents the configuration for the OpenTelemetry NetStats Logs Receiver.
 type OtelNetStatsReceiverConfig struct {
 	// InputConfig embeds the configuration for the network statistics input.
-	InputConfig adapter.FileInputConfig `mapstructure:",squash"`
+	InputConfig file.FileInputConfig `mapstructure:",squash"`
 
 	// BaseConfig embeds the base configuration for the logs receiver.
 	adapter.BaseConfig `mapstructure:",squash"`
 
 	// Log samplers
-	adapter.LogSamplerConfig `mapstructure:",squash"`
+	logsampler.Config `mapstructure:",squash"`
+	LogSamplerConfig  logsampler.Config
 }
 
 // InputConfig unmarshals the input operator
@@ -71,6 +74,6 @@ func (f ReceiverType) InputConfig(cfg component.Config) operator.Config {
 	return operator.NewConfig(&cfg.(*OtelNetStatsReceiverConfig).InputConfig)
 }
 
-func (f ReceiverType) LogSamplers(cfg component.Config) []adapter.LogSampler {
+func (f ReceiverType) LogSamplers(cfg component.Config) []logsampler.LogSampler {
 	return cfg.(*OtelNetStatsReceiverConfig).LogSamplers
 }
